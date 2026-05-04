@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mapa Mundial de Diócesis</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #1a1a2e;
+      color: #e0e0e0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+      z-index: 1000;
+      flex-shrink: 0;
+    }
+
+    header .logo {
+      font-size: 28px;
+    }
+
+    header h1 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #e0e0e0;
+      letter-spacing: 0.5px;
+    }
+
+    header p {
+      font-size: 0.75rem;
+      color: #8899aa;
+      margin-top: 2px;
+    }
+
+    #loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: #1a1a2e;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .spinner {
+      width: 52px; height: 52px;
+      border: 4px solid #0f3460;
+      border-top-color: #e94560;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #loading-overlay p {
+      color: #aab;
+      font-size: 0.9rem;
+    }
+
+    #map-container {
+      flex: 1;
+      position: relative;
+      display: flex;
+    }
+
+    #map {
+      flex: 1;
+    }
+
+    /* Panel lateral */
+    #panel {
+      width: 340px;
+      background: #16213e;
+      border-left: 1px solid #0f3460;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      transition: width 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    #panel.hidden {
+      width: 0;
+      border-left: none;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+      padding: 16px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid #0f3460;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .panel-header h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #e0e0e0;
+      line-height: 1.3;
+      flex: 1;
+      padding-right: 10px;
+    }
+
+    .panel-header .year-badge {
+      background: #e94560;
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 12px;
+      white-space: nowrap;
+      margin-top: 2px;
+    }
+
+    #close-panel {
+      background: none;
+      border: none;
+      color: #8899aa;
+      cursor: pointer;
+      font-size: 1.3rem;
+      line-height: 1;
+      padding: 2px 4px;
+      transition: color 0.2s;
+    }
+
+    #close-panel:hover { color: #e0e0e0; }
+
+    .panel-body {
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .info-section {
+      background: #1a2744;
+      border-radius: 8px;
+      padding: 12px 14px;
+    }
+
+    .info-section h3 {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #6688aa;
+      margin-bottom: 10px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .info-item.full { grid-column: 1 / -1; }
+
+    .info-label {
+      font-size: 0.65rem;
+      color: #6688aa;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .info-value {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #ddeeff;
+    }
+
+    .info-value.big {
+      font-size: 1.2rem;
+      color: #7ec8e3;
+    }
+
+    .info-value.highlight {
+      color: #e94560;
+    }
+
+    .stat-bar {
+      margin-top: 6px;
+      height: 5px;
+      background: #0f3460;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .stat-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #e94560, #ff6b6b);
+      border-radius: 3px;
+      transition: width 0.5s ease;
+    }
+
+    .link-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #7ec8e3;
+      text-decoration: none;
+      font-size: 0.8rem;
+      padding: 6px 12px;
+      border: 1px solid #7ec8e3;
+      border-radius: 6px;
+      transition: all 0.2s;
+      width: fit-content;
+    }
+
+    .link-btn:hover {
+      background: #7ec8e3;
+      color: #1a1a2e;
+    }
+
+    .no-data {
+      padding: 20px;
+      text-align: center;
+      color: #6688aa;
+      font-size: 0.85rem;
+    }
+
+    /* Placeholder */
+    #panel-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 12px;
+      color: #445566;
+      padding: 24px;
+      text-align: center;
+    }
+
+    #panel-placeholder .icon { font-size: 48px; opacity: 0.4; }
+    #panel-placeholder p { font-size: 0.85rem; line-height: 1.5; }
+
+    /* Leyenda */
+    .legend {
+      background: rgba(22, 33, 62, 0.92);
+      border: 1px solid #0f3460;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.75rem;
+      color: #aab;
+      line-height: 1.8;
+    }
+
+    .legend h4 {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #6688aa;
+      margin-bottom: 6px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend-color {
+      width: 14px; height: 14px;
+      border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.15);
+      flex-shrink: 0;
+    }
+
+    /* Tooltip de mapa */
+    .leaflet-tooltip {
+      background: #16213e !important;
+      border: 1px solid #0f3460 !important;
+      color: #e0e0e0 !important;
+      font-family: 'Segoe UI', sans-serif !important;
+      font-size: 0.8rem !important;
+      padding: 5px 10px !important;
+      border-radius: 6px !important;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      #panel { width: 100%; position: absolute; bottom: 0; left: 0; max-height: 55vh; border-left: none; border-top: 1px solid #0f3460; z-index: 500; }
+      #panel.hidden { width: 100%; height: 0; max-height: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <p>Cargando mapa de diócesis…</p>
+</div>
+
+<header>
+  <div class="logo">⛪</div>
+  <div>
+    <h1>Mapa Mundial de Diócesis Católicas</h1>
+    <p>Haz clic en una diócesis para ver sus datos estadísticos</p>
+  </div>
+</header>
+
+<div id="map-container">
+  <div id="map"></div>
+
+  <div id="panel">
+    <div id="panel-placeholder">
+      <div class="icon">🗺️</div>
+      <p>Selecciona una diócesis en el mapa para ver su información detallada.</p>
+    </div>
+    <div id="panel-content" style="display:none;">
+      <div class="panel-header">
+        <div style="flex:1">
+          <h2 id="p-name"></h2>
+          <div style="display:flex; gap:6px; margin-top:4px; flex-wrap:wrap;">
+            <span class="year-badge" id="p-year"></span>
+          </div>
+        </div>
+        <button id="close-panel" title="Cerrar">✕</button>
+      </div>
+      <div class="panel-body">
+
+        <!-- General -->
+        <div class="info-section">
+          <h3>📍 Información general</h3>
+          <div class="info-grid">
+            <div class="info-item full">
+              <span class="info-label">Nombre completo</span>
+              <span class="info-value" id="p-fullname"></span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">País</span>
+              <span class="info-value" id="p-country"></span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Territorio de misión</span>
+              <span class="info-value" id="p-mission"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Población -->
+        <div class="info-section">
+          <h3>👥 Población y católicos</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Católicos</span>
+              <span class="info-value big" id="p-catholics"></span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Población total</span>
+              <span class="info-value big" id="p-totalpop"></span>
+            </div>
+            <div class="info-item full">
+              <span class="info-label">% Católicos</span>
+              <span class="info-value highlight" id="p-percent"></span>
+              <div class="stat-bar"><div class="stat-bar-fill" id="p-bar"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clero -->
+        <div class="info-section">
+          <h3>✝️ Clero y vida consagrada</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Sacerdotes diocesanos</span>
+              <span class="info-value" id="p-diocpriest"></span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Sacerdotes religiosos</span>
+              <span class="info-value" id="p-relpriest"></span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Total sacerdotes</span>
+              <span class="info-value" id="p-totalpriest"></span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Católicos/sacerdote</span>
+              <span class="info-value" id="p-ratio"></span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Diáconos</span>
+              <span class="info-value" id="p-deacons"></span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Religiosos varones</span>
+              <span class="info-value" id="p-malerel"></span>
+            </div>
+            <div class="info-item full">
+              <span class="info-label">Religiosas</span>
+              <span class="info-value" id="p-femalerel"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estructura -->
+        <div class="info-section">
+          <h3>🏛️ Estructura pastoral</h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Parroquias</span>
+              <span class="info-value big" id="p-parishes"></span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Fuente</span>
+              <span class="info-value" id="p-source"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Enlace -->
+        <div id="p-link-section">
+          <a id="p-url" href="#" target="_blank" class="link-btn">
+            🔗 Ver ficha completa
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+// ── Helpers ──────────────────────────────────────────────────────────
+function fmt(n) {
+  if (n === null || n === undefined) return '—';
+  return Number(n).toLocaleString('es-ES');
+}
+function el(id) { return document.getElementById(id); }
+
+// ── Mapa base ────────────────────────────────────────────────────────
+const map = L.map('map', { zoomControl: true }).setView([20, 0], 2);
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '© <a href="https://carto.com/">CARTO</a> | © <a href="https://www.openstreetmap.org/">OSM</a>',
+  maxZoom: 18
+}).addTo(map);
+
+// ── Colores por tipo de diócesis ─────────────────────────────────────
+const TYPE_COLORS = {
+  'd':   { fill: '#4a90d9', label: 'Diócesis' },
+  'a':   { fill: '#e94560', label: 'Archidiócesis' },
+  'ep':  { fill: '#f5a623', label: 'Eparquía' },
+  'aep': { fill: '#bd10e0', label: 'Arquieparquía' },
+  'p':   { fill: '#7ed321', label: 'Prelatura' },
+  'v':   { fill: '#50e3c2', label: 'Vicariato Apostólico' },
+  'pa':  { fill: '#9b59b6', label: 'Prefectura Apostólica' },
+  'mi':  { fill: '#e67e22', label: 'Misión independiente' },
+  'o':   { fill: '#95a5a6', label: 'Ordinariato' },
+};
+
+function getColor(dioType) {
+  const t = (dioType || '').toLowerCase().trim();
+  return (TYPE_COLORS[t] || { fill: '#607d8b' }).fill;
+}
+
+// ── Panel ────────────────────────────────────────────────────────────
+let activeLayer = null;
+
+function showPanel(data, geoProps) {
+  el('panel-placeholder').style.display = 'none';
+  el('panel-content').style.display = 'block';
+  el('panel').classList.remove('hidden');
+
+  const name = data ? data.name : (geoProps.Name || 'Diócesis sin nombre');
+  el('p-name').textContent = name;
+  el('p-year').textContent = data ? `Datos ${data.year}` : 'Sin datos';
+  el('p-fullname').textContent = name;
+
+  if (data) {
+    el('p-country').textContent  = data.country  || geoProps.CountryKey || '—';
+    el('p-mission').textContent  = data.mission === 'SI' ? '✅ Sí' : data.mission === 'NO' ? '❌ No' : '—';
+    el('p-catholics').textContent  = fmt(data.catholics);
+    el('p-totalpop').textContent   = fmt(data.total_pop);
+    const pct = data.percent !== null ? (data.percent * 100).toFixed(1) + '%' : '—';
+    el('p-percent').textContent = pct;
+    el('p-bar').style.width = data.percent !== null ? Math.min(data.percent * 100, 100) + '%' : '0%';
+    el('p-diocpriest').textContent  = fmt(data.dioc_priest);
+    el('p-relpriest').textContent   = fmt(data.rel_priest);
+    el('p-totalpriest').textContent = fmt(data.total_priest);
+    el('p-ratio').textContent       = fmt(data.cath_per_priest);
+    el('p-deacons').textContent     = fmt(data.deacons);
+    el('p-malerel').textContent     = fmt(data.male_rel);
+    el('p-femalerel').textContent   = fmt(data.female_rel);
+    el('p-parishes').textContent    = data.parishes || '—';
+    el('p-source').textContent      = data.source || '—';
+
+    if (data.url) {
+      el('p-url').href = data.url;
+      el('p-link-section').style.display = 'block';
+    } else {
+      el('p-link-section').style.display = 'none';
+    }
+  } else {
+    // Diócesis sin datos en el Excel
+    ['p-country','p-mission','p-catholics','p-totalpop','p-percent',
+     'p-diocpriest','p-relpriest','p-totalpriest','p-ratio',
+     'p-deacons','p-malerel','p-femalerel','p-parishes','p-source'
+    ].forEach(id => el(id).textContent = '—');
+    el('p-bar').style.width = '0%';
+    el('p-link-section').style.display = 'none';
+  }
+}
+
+el('close-panel').onclick = () => {
+  el('panel').classList.add('hidden');
+  if (activeLayer) resetStyle(activeLayer);
+  activeLayer = null;
+};
+
+// ── Estilos de capas ──────────────────────────────────────────────────
+function featureStyle(feature) {
+  return {
+    fillColor: getColor(feature.properties.DioType),
+    fillOpacity: 0.55,
+    color: '#ffffff',
+    weight: 0.4,
+    opacity: 0.5
+  };
+}
+
+function highlightStyle(layer) {
+  layer.setStyle({ fillOpacity: 0.85, weight: 1.5, color: '#ffffff' });
+  layer.bringToFront();
+}
+
+function resetStyle(layer) {
+  geojsonLayer.resetStyle(layer);
+}
+
+// ── Carga de datos ────────────────────────────────────────────────────
+let geojsonLayer;
+let diocesisData = {};
+
+async function loadAll() {
+  const [geoRes, dataRes] = await Promise.all([
+    fetch('diocesis_fronteras.geojson'),
+    fetch('diocesis_data.json')
+  ]);
+
+  diocesisData = await dataRes.json();
+  const geojson  = await geoRes.json();
+
+  geojsonLayer = L.geoJSON(geojson, {
+    style: featureStyle,
+    onEachFeature: (feature, layer) => {
+      const props = feature.properties;
+      const id    = props.OBJECTID;
+      const data  = diocesisData[id] || null;
+      const name  = data ? data.name : (props.Name || 'Diócesis');
+
+      layer.bindTooltip(name, { sticky: true, offset: [10, 0] });
+
+      layer.on({
+        mouseover(e) {
+          if (activeLayer !== layer) highlightStyle(layer);
+        },
+        mouseout(e) {
+          if (activeLayer !== layer) resetStyle(layer);
+        },
+        click(e) {
+          if (activeLayer && activeLayer !== layer) resetStyle(activeLayer);
+          activeLayer = layer;
+          highlightStyle(layer);
+          showPanel(data, props);
+          L.DomEvent.stopPropagation(e);
+        }
+      });
+    }
+  }).addTo(map);
+
+  // Leyenda
+  addLegend();
+
+  // Ocultar spinner
+  el('loading-overlay').style.display = 'none';
+}
+
+// ── Leyenda ───────────────────────────────────────────────────────────
+function addLegend() {
+  const legend = L.control({ position: 'bottomleft' });
+  legend.onAdd = () => {
+    const div = L.DomUtil.create('div', 'legend');
+    div.innerHTML = '<h4>Tipo de circunscripción</h4>';
+    for (const [key, val] of Object.entries(TYPE_COLORS)) {
+      div.innerHTML += `
+        <div class="legend-item">
+          <div class="legend-color" style="background:${val.fill}"></div>
+          <span>${val.label}</span>
+        </div>`;
+    }
+    return div;
+  };
+  legend.addTo(map);
+}
+
+// Clic en mapa vacío → cierra panel
+map.on('click', () => {
+  if (activeLayer) resetStyle(activeLayer);
+  activeLayer = null;
+  el('panel').classList.add('hidden');
+  el('panel-placeholder').style.display = 'flex';
+  el('panel-content').style.display = 'none';
+});
+
+loadAll().catch(err => {
+  console.error(err);
+  el('loading-overlay').innerHTML = `<p style="color:#e94560">❌ Error cargando los archivos: ${err.message}</p>`;
+});
+</script>
+</body>
+</html>
