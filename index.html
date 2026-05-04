@@ -19,44 +19,59 @@
 
     header {
       background: linear-gradient(135deg, #16213e 0%, #0f3460 100%);
-      padding: 12px 20px;
+      padding: 10px 20px;
       display: flex;
       align-items: center;
       gap: 14px;
       box-shadow: 0 2px 12px rgba(0,0,0,0.5);
       z-index: 1000;
       flex-shrink: 0;
+      flex-wrap: wrap;
     }
 
-    header .logo {
-      font-size: 28px;
-    }
+    header .logo { font-size: 26px; }
+    .header-text { flex: 1; min-width: 200px; }
+    .header-text h1 { font-size: 1.1rem; font-weight: 600; color: #e0e0e0; }
+    .header-text p  { font-size: 0.72rem; color: #8899aa; margin-top: 2px; }
 
-    header h1 {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: #e0e0e0;
-      letter-spacing: 0.5px;
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid #0f3460;
+      border-radius: 8px;
+      padding: 6px 12px;
     }
+    .filter-group label { font-size: 0.72rem; color: #8899aa; white-space: nowrap; }
 
-    header p {
-      font-size: 0.75rem;
+    .seg-btn {
+      display: flex;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #0f3460;
+    }
+    .seg-btn button {
+      background: transparent;
+      border: none;
       color: #8899aa;
-      margin-top: 2px;
+      font-size: 0.72rem;
+      padding: 4px 11px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      white-space: nowrap;
     }
+    .seg-btn button:not(:last-child) { border-right: 1px solid #0f3460; }
+    .seg-btn button.active { background: #e94560; color: #fff; font-weight: 600; }
+    .seg-btn button:hover:not(.active) { background: rgba(255,255,255,0.08); color: #e0e0e0; }
 
     #loading-overlay {
-      position: fixed;
-      inset: 0;
+      position: fixed; inset: 0;
       background: #1a1a2e;
       z-index: 9999;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 16px;
     }
-
     .spinner {
       width: 52px; height: 52px;
       border: 4px solid #0f3460;
@@ -64,247 +79,73 @@
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
-
     @keyframes spin { to { transform: rotate(360deg); } }
+    #loading-overlay p { color: #aab; font-size: 0.9rem; }
 
-    #loading-overlay p {
-      color: #aab;
-      font-size: 0.9rem;
-    }
+    #map-container { flex: 1; position: relative; display: flex; }
+    #map { flex: 1; }
 
-    #map-container {
-      flex: 1;
-      position: relative;
-      display: flex;
-    }
-
-    #map {
-      flex: 1;
-    }
-
-    /* Panel lateral */
     #panel {
       width: 340px;
       background: #16213e;
       border-left: 1px solid #0f3460;
       overflow-y: auto;
-      display: flex;
-      flex-direction: column;
+      display: flex; flex-direction: column;
       transition: width 0.3s ease;
       flex-shrink: 0;
     }
-
-    #panel.hidden {
-      width: 0;
-      border-left: none;
-      overflow: hidden;
-    }
+    #panel.hidden { width: 0; border-left: none; overflow: hidden; }
 
     .panel-header {
       background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
-      padding: 16px 18px;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
+      padding: 14px 16px;
+      display: flex; justify-content: space-between; align-items: flex-start;
       border-bottom: 1px solid #0f3460;
-      position: sticky;
-      top: 0;
-      z-index: 10;
+      position: sticky; top: 0; z-index: 10;
     }
+    .panel-header h2 { font-size: 0.95rem; font-weight: 600; color: #e0e0e0; line-height: 1.3; flex: 1; padding-right: 10px; }
 
-    .panel-header h2 {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #e0e0e0;
-      line-height: 1.3;
-      flex: 1;
-      padding-right: 10px;
-    }
+    .badge-row { display: flex; gap: 5px; margin-top: 5px; flex-wrap: wrap; }
+    .badge { font-size: 0.63rem; font-weight: 700; padding: 2px 8px; border-radius: 12px; white-space: nowrap; }
+    .badge-year    { background: #e94560; color: #fff; }
+    .badge-mission { background: #f5a623; color: #1a1a2e; }
 
-    .panel-header .year-badge {
-      background: #e94560;
-      color: white;
-      font-size: 0.7rem;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 12px;
-      white-space: nowrap;
-      margin-top: 2px;
-    }
-
-    #close-panel {
-      background: none;
-      border: none;
-      color: #8899aa;
-      cursor: pointer;
-      font-size: 1.3rem;
-      line-height: 1;
-      padding: 2px 4px;
-      transition: color 0.2s;
-    }
-
+    #close-panel { background: none; border: none; color: #8899aa; cursor: pointer; font-size: 1.3rem; line-height: 1; padding: 2px 4px; transition: color 0.2s; }
     #close-panel:hover { color: #e0e0e0; }
 
-    .panel-body {
-      padding: 16px 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
+    .panel-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
 
-    .info-section {
-      background: #1a2744;
-      border-radius: 8px;
-      padding: 12px 14px;
-    }
+    .info-section { background: #1a2744; border-radius: 8px; padding: 11px 13px; }
+    .info-section h3 { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #6688aa; margin-bottom: 9px; }
 
-    .info-section h3 {
-      font-size: 0.65rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #6688aa;
-      margin-bottom: 10px;
-    }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .info-item {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .info-item { display: flex; flex-direction: column; gap: 2px; }
     .info-item.full { grid-column: 1 / -1; }
+    .info-label { font-size: 0.63rem; color: #6688aa; text-transform: uppercase; letter-spacing: 0.5px; }
+    .info-value { font-size: 0.88rem; font-weight: 600; color: #ddeeff; }
+    .info-value.big { font-size: 1.15rem; color: #7ec8e3; }
+    .info-value.highlight { color: #e94560; }
 
-    .info-label {
-      font-size: 0.65rem;
-      color: #6688aa;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+    .stat-bar { margin-top: 5px; height: 5px; background: #0f3460; border-radius: 3px; overflow: hidden; }
+    .stat-bar-fill { height: 100%; background: linear-gradient(90deg, #e94560, #ff6b6b); border-radius: 3px; transition: width 0.5s ease; }
 
-    .info-value {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: #ddeeff;
-    }
+    .link-btn { display: inline-flex; align-items: center; gap: 6px; color: #7ec8e3; text-decoration: none; font-size: 0.8rem; padding: 6px 12px; border: 1px solid #7ec8e3; border-radius: 6px; transition: all 0.2s; width: fit-content; }
+    .link-btn:hover { background: #7ec8e3; color: #1a1a2e; }
 
-    .info-value.big {
-      font-size: 1.2rem;
-      color: #7ec8e3;
-    }
-
-    .info-value.highlight {
-      color: #e94560;
-    }
-
-    .stat-bar {
-      margin-top: 6px;
-      height: 5px;
-      background: #0f3460;
-      border-radius: 3px;
-      overflow: hidden;
-    }
-
-    .stat-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, #e94560, #ff6b6b);
-      border-radius: 3px;
-      transition: width 0.5s ease;
-    }
-
-    .link-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: #7ec8e3;
-      text-decoration: none;
-      font-size: 0.8rem;
-      padding: 6px 12px;
-      border: 1px solid #7ec8e3;
-      border-radius: 6px;
-      transition: all 0.2s;
-      width: fit-content;
-    }
-
-    .link-btn:hover {
-      background: #7ec8e3;
-      color: #1a1a2e;
-    }
-
-    .no-data {
-      padding: 20px;
-      text-align: center;
-      color: #6688aa;
-      font-size: 0.85rem;
-    }
-
-    /* Placeholder */
-    #panel-placeholder {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      gap: 12px;
-      color: #445566;
-      padding: 24px;
-      text-align: center;
-    }
-
+    #panel-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 12px; color: #445566; padding: 24px; text-align: center; }
     #panel-placeholder .icon { font-size: 48px; opacity: 0.4; }
     #panel-placeholder p { font-size: 0.85rem; line-height: 1.5; }
 
-    /* Leyenda */
-    .legend {
-      background: rgba(22, 33, 62, 0.92);
-      border: 1px solid #0f3460;
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: 0.75rem;
-      color: #aab;
-      line-height: 1.8;
-    }
+    .legend { background: rgba(22,33,62,0.92); border: 1px solid #0f3460; border-radius: 8px; padding: 10px 13px; font-size: 0.73rem; color: #aab; line-height: 1.8; }
+    .legend h4 { font-size: 0.67rem; text-transform: uppercase; letter-spacing: 1px; color: #6688aa; margin-bottom: 6px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; }
+    .legend-color { width: 13px; height: 13px; border-radius: 3px; border: 1px solid rgba(255,255,255,0.15); flex-shrink: 0; }
 
-    .legend h4 {
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #6688aa;
-      margin-bottom: 6px;
-    }
+    .map-counter { background: rgba(22,33,62,0.92); border: 1px solid #0f3460; border-radius: 8px; padding: 7px 12px; font-size: 0.72rem; color: #aab; }
+    .map-counter strong { color: #7ec8e3; }
 
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    .leaflet-tooltip { background: #16213e !important; border: 1px solid #0f3460 !important; color: #e0e0e0 !important; font-family: 'Segoe UI', sans-serif !important; font-size: 0.78rem !important; padding: 4px 9px !important; border-radius: 6px !important; box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important; }
 
-    .legend-color {
-      width: 14px; height: 14px;
-      border-radius: 3px;
-      border: 1px solid rgba(255,255,255,0.15);
-      flex-shrink: 0;
-    }
-
-    /* Tooltip de mapa */
-    .leaflet-tooltip {
-      background: #16213e !important;
-      border: 1px solid #0f3460 !important;
-      color: #e0e0e0 !important;
-      font-family: 'Segoe UI', sans-serif !important;
-      font-size: 0.8rem !important;
-      padding: 5px 10px !important;
-      border-radius: 6px !important;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important;
-    }
-
-    /* Responsive */
     @media (max-width: 600px) {
       #panel { width: 100%; position: absolute; bottom: 0; left: 0; max-height: 55vh; border-left: none; border-top: 1px solid #0f3460; z-index: 500; }
       #panel.hidden { width: 100%; height: 0; max-height: 0; }
@@ -320,9 +161,17 @@
 
 <header>
   <div class="logo">⛪</div>
-  <div>
+  <div class="header-text">
     <h1>Mapa Mundial de Diócesis Católicas</h1>
     <p>Haz clic en una diócesis para ver sus datos estadísticos</p>
+  </div>
+  <div class="filter-group">
+    <label>Territorio de misión:</label>
+    <div class="seg-btn">
+      <button id="btn-todos"    onclick="setFilter('todos')">Todos</button>
+      <button id="btn-mision"   onclick="setFilter('mision')" class="active">Solo misión</button>
+      <button id="btn-nomision" onclick="setFilter('nomision')">No misión</button>
+    </div>
   </div>
 </header>
 
@@ -338,15 +187,15 @@
       <div class="panel-header">
         <div style="flex:1">
           <h2 id="p-name"></h2>
-          <div style="display:flex; gap:6px; margin-top:4px; flex-wrap:wrap;">
-            <span class="year-badge" id="p-year"></span>
+          <div class="badge-row">
+            <span class="badge badge-year" id="p-year"></span>
+            <span class="badge badge-mission" id="p-mission-badge" style="display:none"></span>
           </div>
         </div>
         <button id="close-panel" title="Cerrar">✕</button>
       </div>
       <div class="panel-body">
 
-        <!-- General -->
         <div class="info-section">
           <h3>📍 Información general</h3>
           <div class="info-grid">
@@ -354,18 +203,17 @@
               <span class="info-label">Nombre completo</span>
               <span class="info-value" id="p-fullname"></span>
             </div>
-            <div class="info-item">
+            <div class="info-item full">
               <span class="info-label">País</span>
               <span class="info-value" id="p-country"></span>
             </div>
-            <div class="info-item">
-              <span class="info-label">Territorio de misión</span>
-              <span class="info-value" id="p-mission"></span>
+            <div class="info-item full">
+              <span class="info-label">Tipo</span>
+              <span class="info-value" id="p-type"></span>
             </div>
           </div>
         </div>
 
-        <!-- Población -->
         <div class="info-section">
           <h3>👥 Población y católicos</h3>
           <div class="info-grid">
@@ -385,7 +233,6 @@
           </div>
         </div>
 
-        <!-- Clero -->
         <div class="info-section">
           <h3>✝️ Clero y vida consagrada</h3>
           <div class="info-grid">
@@ -420,7 +267,6 @@
           </div>
         </div>
 
-        <!-- Estructura -->
         <div class="info-section">
           <h3>🏛️ Estructura pastoral</h3>
           <div class="info-grid">
@@ -435,13 +281,9 @@
           </div>
         </div>
 
-        <!-- Enlace -->
         <div id="p-link-section">
-          <a id="p-url" href="#" target="_blank" class="link-btn">
-            🔗 Ver ficha completa
-          </a>
+          <a id="p-url" href="#" target="_blank" class="link-btn">🔗 Ver ficha completa</a>
         </div>
-
       </div>
     </div>
   </div>
@@ -449,22 +291,78 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
-// ── Helpers ──────────────────────────────────────────────────────────
-function fmt(n) {
-  if (n === null || n === undefined) return '—';
-  return Number(n).toLocaleString('es-ES');
+// ══════════════════════════════════════════════
+// PAÍSES: código ISO-2 → nombre en español
+// ══════════════════════════════════════════════
+const COUNTRY_NAMES = {
+  af:'Afganistán',al:'Albania',dz:'Argelia',ao:'Angola',ar:'Argentina',
+  am:'Armenia',at:'Austria',au:'Australia',az:'Azerbaiyán',ba:'Bosnia y Herzegovina',
+  bd:'Bangladés',be:'Bélgica',bf:'Burkina Faso',bg:'Bulgaria',bi:'Burundi',
+  bj:'Benín',bn:'Brunéi',bo:'Bolivia',br:'Brasil',bw:'Botsuana',
+  by:'Bielorrusia',ca:'Canadá',cd:'Rep. Dem. del Congo',cf:'Rep. Centroafricana',
+  cg:'Congo',ch:'Suiza',ci:'Costa de Marfil',cl:'Chile',cm:'Camerún',
+  cn:'China',co:'Colombia',cr:'Costa Rica',cu:'Cuba',cv:'Cabo Verde',
+  cy:'Chipre',cz:'República Checa',de:'Alemania',dj:'Yibuti',dk:'Dinamarca',
+  do:'República Dominicana',ec:'Ecuador',ee:'Estonia',eg:'Egipto',
+  eh:'Sáhara Occidental',er:'Eritrea',es:'España',et:'Etiopía',fi:'Finlandia',
+  fr:'Francia',ga:'Gabón',gb:'Reino Unido',gh:'Ghana',gm:'Gambia',
+  gn:'Guinea',gq:'Guinea Ecuatorial',gr:'Grecia',gt:'Guatemala',gw:'Guinea-Bisáu',
+  gu:'Guam',hn:'Honduras',hr:'Croacia',ht:'Haití',hu:'Hungría',
+  id:'Indonesia',ie:'Irlanda',in:'India',iq:'Irak',ir:'Irán',
+  is:'Islandia',it:'Italia',jp:'Japón',ke:'Kenia',kg:'Kirguistán',
+  kh:'Camboya',km:'Comoras',kp:'Corea del Norte',kr:'Corea del Sur',
+  kw:'Kuwait',kz:'Kazajistán',la:'Laos',lb:'Líbano',li:'Liechtenstein',
+  lk:'Sri Lanka',lr:'Liberia',ls:'Lesoto',lt:'Lituania',lu:'Luxemburgo',
+  lv:'Letonia',ly:'Libia',ma:'Marruecos',mc:'Mónaco',md:'Moldavia',
+  me:'Montenegro',mg:'Madagascar',mk:'Macedonia del Norte',ml:'Malí',
+  mm:'Myanmar',mn:'Mongolia',mr:'Mauritania',mt:'Malta',mu:'Mauricio',
+  mw:'Malaui',mx:'México',my:'Malasia',mz:'Mozambique',na:'Namibia',
+  ne:'Níger',ng:'Nigeria',ni:'Nicaragua',nl:'Países Bajos',no:'Noruega',
+  np:'Nepal',nz:'Nueva Zelanda',pa:'Panamá',pe:'Perú',pg:'Papúa Nueva Guinea',
+  ph:'Filipinas',pk:'Pakistán',pl:'Polonia',pr:'Puerto Rico',ps:'Palestina',
+  pt:'Portugal',py:'Paraguay',ro:'Rumanía',rs:'Serbia',ru:'Rusia',
+  rw:'Ruanda',sb:'Islas Salomón',sd:'Sudán',se:'Suecia',sg:'Singapur',
+  si:'Eslovenia',sk:'Eslovaquia',sl:'Sierra Leona',sn:'Senegal',so:'Somalia',
+  ss:'Sudán del Sur',st:'Santo Tomé y Príncipe',sv:'El Salvador',
+  sy:'Siria',sz:'Esuatini',td:'Chad',tg:'Togo',th:'Tailandia',
+  tj:'Tayikistán',tl:'Timor Oriental',tm:'Turkmenistán',tn:'Túnez',
+  tr:'Turquía',tw:'Taiwán',tz:'Tanzania',ua:'Ucrania',ug:'Uganda',
+  us:'Estados Unidos',uy:'Uruguay',uz:'Uzbekistán',ve:'Venezuela',
+  vn:'Vietnam',ye:'Yemen',za:'Sudáfrica',zm:'Zambia',zw:'Zimbabue',
+  a0:'Ciudad del Vaticano',p0:'Territorio especial',
+  fj:'Fiyi',to:'Tonga',ws:'Samoa',vu:'Vanuatu',ki:'Kiribati',
+  nr:'Nauru',pw:'Palau',fm:'Micronesia',mh:'Islas Marshall',tv:'Tuvalu',
+  ck:'Islas Cook',as:'Samoa Americana',mp:'Islas Marianas del Norte',
+  vi:'Islas Vírgenes EE.UU.',vg:'Islas Vírgenes Británicas',
+  ai:'Anguila',ms:'Montserrat',ag:'Antigua y Barbuda',bb:'Barbados',
+  bs:'Bahamas',bz:'Belice',dm:'Dominica',gd:'Granada',gy:'Guyana',
+  jm:'Jamaica',kn:'San Cristóbal y Nieves',lc:'Santa Lucía',
+  sr:'Surinam',tt:'Trinidad y Tobago',vc:'San Vicente y las Granadinas',
+  sc:'Seychelles',mv:'Maldivas',bh:'Baréin',
+};
+
+function flagEmoji(code) {
+  if (!code) return '🌍';
+  const c = code.toLowerCase();
+  if (c === 'a0') return '🇻🇦';
+  if (c === 'p0') return '🌐';
+  if (c.length !== 2) return '🌍';
+  try {
+    return String.fromCodePoint(c.charCodeAt(0) - 97 + 0x1F1E6) +
+           String.fromCodePoint(c.charCodeAt(1) - 97 + 0x1F1E6);
+  } catch { return '🌍'; }
 }
-function el(id) { return document.getElementById(id); }
 
-// ── Mapa base ────────────────────────────────────────────────────────
-const map = L.map('map', { zoomControl: true }).setView([20, 0], 2);
+function countryDisplay(code) {
+  if (!code) return '—';
+  const c = code.toLowerCase();
+  const name = COUNTRY_NAMES[c] || code.toUpperCase();
+  return flagEmoji(c) + '\u00A0' + name;
+}
 
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-  attribution: '© <a href="https://carto.com/">CARTO</a> | © <a href="https://www.openstreetmap.org/">OSM</a>',
-  maxZoom: 18
-}).addTo(map);
-
-// ── Colores por tipo de diócesis ─────────────────────────────────────
+// ══════════════════════════════════════════════
+// TIPOS
+// ══════════════════════════════════════════════
 const TYPE_COLORS = {
   'd':   { fill: '#4a90d9', label: 'Diócesis' },
   'a':   { fill: '#e94560', label: 'Archidiócesis' },
@@ -481,28 +379,120 @@ function getColor(dioType) {
   const t = (dioType || '').toLowerCase().trim();
   return (TYPE_COLORS[t] || { fill: '#607d8b' }).fill;
 }
+function typeName(dioType) {
+  const t = (dioType || '').toLowerCase().trim();
+  return (TYPE_COLORS[t] || { label: dioType || '—' }).label;
+}
 
-// ── Panel ────────────────────────────────────────────────────────────
-let activeLayer = null;
+function fmt(n) {
+  if (n === null || n === undefined) return '—';
+  return Number(n).toLocaleString('es-ES');
+}
+function el(id) { return document.getElementById(id); }
 
+// ══════════════════════════════════════════════
+// MAPA
+// ══════════════════════════════════════════════
+const map = L.map('map', { zoomControl: true }).setView([20, 0], 2);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '© <a href="https://carto.com/">CARTO</a> | © <a href="https://www.openstreetmap.org/">OSM</a>',
+  maxZoom: 18
+}).addTo(map);
+
+// ══════════════════════════════════════════════
+// FILTRO
+// ══════════════════════════════════════════════
+let currentFilter = 'mision';
+let diocesisData  = {};
+let geojsonLayer;
+let activeLayer   = null;
+let counterControl;
+
+function missionOf(id) {
+  const d = diocesisData[id];
+  return d ? d.mission : null;
+}
+
+function featureVisible(feature) {
+  if (currentFilter === 'todos') return true;
+  const m = missionOf(feature.properties.OBJECTID);
+  if (currentFilter === 'mision')   return m === 'SI';
+  if (currentFilter === 'nomision') return m === 'NO';
+  return true;
+}
+
+function featureStyle(feature) {
+  const vis = featureVisible(feature);
+  return {
+    fillColor:   getColor(feature.properties.DioType),
+    fillOpacity: vis ? 0.55 : 0,
+    color:       '#ffffff',
+    weight:      vis ? 0.4 : 0,
+    opacity:     vis ? 0.5 : 0,
+  };
+}
+
+function highlightStyle(layer) {
+  layer.setStyle({ fillOpacity: 0.85, weight: 1.5, color: '#ffffff', opacity: 1 });
+  layer.bringToFront();
+}
+
+function resetStyle(layer) { geojsonLayer.resetStyle(layer); }
+
+function setFilter(mode) {
+  currentFilter = mode;
+  ['todos','mision','nomision'].forEach(m =>
+    el('btn-' + m).classList.toggle('active', m === mode)
+  );
+
+  if (activeLayer) { resetStyle(activeLayer); activeLayer = null; }
+  el('panel').classList.add('hidden');
+  el('panel-placeholder').style.display = 'flex';
+  el('panel-content').style.display = 'none';
+
+  let visible = 0;
+  geojsonLayer.eachLayer(layer => {
+    const style = featureStyle(layer.feature);
+    layer.setStyle(style);
+    if (style.fillOpacity > 0) visible++;
+  });
+  updateCounter(visible);
+}
+
+function updateCounter(n) {
+  if (counterControl) {
+    counterControl.getContainer().innerHTML =
+      `<strong>${n.toLocaleString('es-ES')}</strong> diócesis visibles`;
+  }
+}
+
+// ══════════════════════════════════════════════
+// PANEL
+// ══════════════════════════════════════════════
 function showPanel(data, geoProps) {
   el('panel-placeholder').style.display = 'none';
   el('panel-content').style.display = 'block';
   el('panel').classList.remove('hidden');
 
   const name = data ? data.name : (geoProps.Name || 'Diócesis sin nombre');
-  el('p-name').textContent = name;
-  el('p-year').textContent = data ? `Datos ${data.year}` : 'Sin datos';
+  el('p-name').textContent     = name;
   el('p-fullname').textContent = name;
+  el('p-year').textContent     = data ? `Datos ${data.year}` : 'Sin datos';
+  el('p-type').textContent     = typeName(geoProps.DioType);
+
+  const isMission = data && data.mission === 'SI';
+  const mb = el('p-mission-badge');
+  if (isMission) { mb.textContent = '🌍 Territorio de misión'; mb.style.display = 'inline'; }
+  else { mb.style.display = 'none'; }
+
+  el('p-country').textContent = countryDisplay(geoProps.CountryKey || '');
 
   if (data) {
-    el('p-country').textContent  = data.country  || geoProps.CountryKey || '—';
-    el('p-mission').textContent  = data.mission === 'SI' ? '✅ Sí' : data.mission === 'NO' ? '❌ No' : '—';
-    el('p-catholics').textContent  = fmt(data.catholics);
-    el('p-totalpop').textContent   = fmt(data.total_pop);
+    el('p-catholics').textContent   = fmt(data.catholics);
+    el('p-totalpop').textContent    = fmt(data.total_pop);
     const pct = data.percent !== null ? (data.percent * 100).toFixed(1) + '%' : '—';
-    el('p-percent').textContent = pct;
-    el('p-bar').style.width = data.percent !== null ? Math.min(data.percent * 100, 100) + '%' : '0%';
+    el('p-percent').textContent     = pct;
+    el('p-bar').style.width         = data.percent !== null ? Math.min(data.percent * 100, 100) + '%' : '0%';
     el('p-diocpriest').textContent  = fmt(data.dioc_priest);
     el('p-relpriest').textContent   = fmt(data.rel_priest);
     el('p-totalpriest').textContent = fmt(data.total_priest);
@@ -511,20 +501,14 @@ function showPanel(data, geoProps) {
     el('p-malerel').textContent     = fmt(data.male_rel);
     el('p-femalerel').textContent   = fmt(data.female_rel);
     el('p-parishes').textContent    = data.parishes || '—';
-    el('p-source').textContent      = data.source || '—';
+    el('p-source').textContent      = data.source   || '—';
 
-    if (data.url) {
-      el('p-url').href = data.url;
-      el('p-link-section').style.display = 'block';
-    } else {
-      el('p-link-section').style.display = 'none';
-    }
+    if (data.url) { el('p-url').href = data.url; el('p-link-section').style.display = 'block'; }
+    else { el('p-link-section').style.display = 'none'; }
   } else {
-    // Diócesis sin datos en el Excel
-    ['p-country','p-mission','p-catholics','p-totalpop','p-percent',
-     'p-diocpriest','p-relpriest','p-totalpriest','p-ratio',
-     'p-deacons','p-malerel','p-femalerel','p-parishes','p-source'
-    ].forEach(id => el(id).textContent = '—');
+    ['p-catholics','p-totalpop','p-percent','p-diocpriest','p-relpriest',
+     'p-totalpriest','p-ratio','p-deacons','p-malerel','p-femalerel',
+     'p-parishes','p-source'].forEach(id => el(id).textContent = '—');
     el('p-bar').style.width = '0%';
     el('p-link-section').style.display = 'none';
   }
@@ -536,30 +520,9 @@ el('close-panel').onclick = () => {
   activeLayer = null;
 };
 
-// ── Estilos de capas ──────────────────────────────────────────────────
-function featureStyle(feature) {
-  return {
-    fillColor: getColor(feature.properties.DioType),
-    fillOpacity: 0.55,
-    color: '#ffffff',
-    weight: 0.4,
-    opacity: 0.5
-  };
-}
-
-function highlightStyle(layer) {
-  layer.setStyle({ fillOpacity: 0.85, weight: 1.5, color: '#ffffff' });
-  layer.bringToFront();
-}
-
-function resetStyle(layer) {
-  geojsonLayer.resetStyle(layer);
-}
-
-// ── Carga de datos ────────────────────────────────────────────────────
-let geojsonLayer;
-let diocesisData = {};
-
+// ══════════════════════════════════════════════
+// CARGA
+// ══════════════════════════════════════════════
 async function loadAll() {
   const [geoRes, dataRes] = await Promise.all([
     fetch('diocesis_fronteras.geojson'),
@@ -567,7 +530,9 @@ async function loadAll() {
   ]);
 
   diocesisData = await dataRes.json();
-  const geojson  = await geoRes.json();
+  const geojson = await geoRes.json();
+
+  let totalVisible = 0;
 
   geojsonLayer = L.geoJSON(geojson, {
     style: featureStyle,
@@ -577,16 +542,19 @@ async function loadAll() {
       const data  = diocesisData[id] || null;
       const name  = data ? data.name : (props.Name || 'Diócesis');
 
+      if (featureVisible(feature)) totalVisible++;
+
       layer.bindTooltip(name, { sticky: true, offset: [10, 0] });
 
       layer.on({
-        mouseover(e) {
-          if (activeLayer !== layer) highlightStyle(layer);
+        mouseover() {
+          if (activeLayer !== layer && featureVisible(feature)) highlightStyle(layer);
         },
-        mouseout(e) {
+        mouseout() {
           if (activeLayer !== layer) resetStyle(layer);
         },
         click(e) {
+          if (!featureVisible(feature)) return;
           if (activeLayer && activeLayer !== layer) resetStyle(activeLayer);
           activeLayer = layer;
           highlightStyle(layer);
@@ -597,32 +565,34 @@ async function loadAll() {
     }
   }).addTo(map);
 
-  // Leyenda
   addLegend();
-
-  // Ocultar spinner
+  addCounter(totalVisible);
   el('loading-overlay').style.display = 'none';
 }
 
-// ── Leyenda ───────────────────────────────────────────────────────────
 function addLegend() {
   const legend = L.control({ position: 'bottomleft' });
   legend.onAdd = () => {
     const div = L.DomUtil.create('div', 'legend');
     div.innerHTML = '<h4>Tipo de circunscripción</h4>';
-    for (const [key, val] of Object.entries(TYPE_COLORS)) {
-      div.innerHTML += `
-        <div class="legend-item">
-          <div class="legend-color" style="background:${val.fill}"></div>
-          <span>${val.label}</span>
-        </div>`;
+    for (const [, val] of Object.entries(TYPE_COLORS)) {
+      div.innerHTML += `<div class="legend-item"><div class="legend-color" style="background:${val.fill}"></div><span>${val.label}</span></div>`;
     }
     return div;
   };
   legend.addTo(map);
 }
 
-// Clic en mapa vacío → cierra panel
+function addCounter(n) {
+  counterControl = L.control({ position: 'bottomright' });
+  counterControl.onAdd = () => {
+    const div = L.DomUtil.create('div', 'map-counter');
+    div.innerHTML = `<strong>${n.toLocaleString('es-ES')}</strong> diócesis visibles`;
+    return div;
+  };
+  counterControl.addTo(map);
+}
+
 map.on('click', () => {
   if (activeLayer) resetStyle(activeLayer);
   activeLayer = null;
@@ -633,7 +603,7 @@ map.on('click', () => {
 
 loadAll().catch(err => {
   console.error(err);
-  el('loading-overlay').innerHTML = `<p style="color:#e94560">❌ Error cargando los archivos: ${err.message}</p>`;
+  el('loading-overlay').innerHTML = `<p style="color:#e94560;padding:20px">❌ Error: ${err.message}</p>`;
 });
 </script>
 </body>
